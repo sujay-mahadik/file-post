@@ -1,0 +1,61 @@
+.inputstyle {
+    min-height: "auto";
+    min-width: "auto";
+    background-color: grey;
+    color: "#FFFFFF";
+    box-shadow:
+        "0 2px 2px 0 rgba(153, 153, 153, 0.14), 0 3px 1px -2px rgba(153, 153, 153, 0.2), 0 1px 5px 0 rgba(153, 153, 153, 0.12)";
+    border: "none";
+    border-radius: "3px";
+    position: "relative";
+    padding: "12px 30px";
+    margin: ".3125rem 1px";
+    font-size: "12px";
+    font-weight: "400";
+    text-transform: "uppercase";
+    letter-spacing: "0";
+    will-change: "box-shadow, transform";
+    transition:
+        "box-shadow 0.2s cubic-bezier(0.4, 0, 1, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1)";
+    line-height: "1.42857143";
+    text-align: "center";
+    white-space: "nowrap";
+    vertical-align: "middle";
+    touch-action: "manipulation";
+    cursor: "pointer";
+}
+
+.input:hover,
+.input:focus {
+    color: "#FFFFFF";
+    background-color: grayColor;
+    box-shadow:
+        "0 14px 26px -12px rgba(153, 153, 153, 0.42), 0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(153, 153, 153, 0.2)"
+}
+
+.upload-btn-wrapper {
+    overflow: hidden;
+    display: inline-block;
+}
+
+.btn {
+    border: 2px solid gray;
+    color: gray;
+    background-color: white;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.upload-btn-wrapper input[type=file] {
+    font-size: 100px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+}
+
+input[type="file"] {
+    display: none;
+}
