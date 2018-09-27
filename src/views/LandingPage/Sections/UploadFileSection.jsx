@@ -4,17 +4,18 @@ import {Form} from "react-bootstrap";
 import withStyles from "@material-ui/core/styles/withStyles";
 
 // @material-ui/icons
-import Chat from "@material-ui/icons/Chat";
-import VerifiedUser from "@material-ui/icons/VerifiedUser";
-import Fingerprint from "@material-ui/icons/Fingerprint";
+// import Chat from "@material-ui/icons/Chat";
+// import VerifiedUser from "@material-ui/icons/VerifiedUser";
+// import Fingerprint from "@material-ui/icons/Fingerprint";
 // core components
 import GridContainer from "components/Grid/GridContainer.jsx";
 import GridItem from "components/Grid/GridItem.jsx";
-import InfoArea from "components/InfoArea/InfoArea.jsx";
+
+//import InfoArea from "components/InfoArea/InfoArea.jsx";
 
 import CustomLinearProgress from "components/CustomLinearProgress/CustomLinearProgress.jsx";
 import Button from "components/CustomButtons/Button.jsx";
-import Input from "components/CustomInput/CustomInput.jsx"
+//import Input from "components/CustomInput/CustomInput.jsx"
 import "../css/custom.css"
 import "../css/material-kit.css"
 import "../css/demo.css"
@@ -24,14 +25,15 @@ import web3 from '../../../web3.js';
 import ipfs from '../../../ipfs.js';
 import storehash from '../../../storehash.js';
 
+import productStyle from "assets/jss/material-kit-react/views/landingPageSections/productStyle.jsx";
+
 //progress bar
 //import FileUploadProgress from 'react-fileupload-progress';
 
-import productStyle from "assets/jss/material-kit-react/views/landingPageSections/productStyle.jsx";
+
 
 class UploadFileSection extends React.Component {
-  
-  //eth-ipfs
+    //eth-ipfs
   state = {
     ipfsHash:'hash will be available here after successful file upload',
     ipfsURL:'',
@@ -42,10 +44,11 @@ class UploadFileSection extends React.Component {
     transactionHash:'',
     gasUsed:'',
     txReceipt: '',
-    percentUploaded: '',
+    percentUploaded: 0  ,
     fileSize: '',
     fileName: 'Select File',
-    fileType: ''
+    fileType: '',
+    fileExt: ''
   };
  
   captureFile =(event) => {
@@ -58,10 +61,7 @@ class UploadFileSection extends React.Component {
       this.setState({fileSize: event.target.files[0].size})
       this.setState({fileName: event.target.files[0].name})
       this.setState({fileType: event.target.files[0].type})
-
-      let file_name = event.target.files[0].name;
-    let file_type = event.target.files[0].type;
-
+      this.setState({fileExt: event.target.files[0].name.split('.').pop()})
       reader.readAsArrayBuffer(file)
       reader.onloadend = () => this.convertToBuffer(reader)
 
@@ -97,6 +97,7 @@ class UploadFileSection extends React.Component {
 } //onClick
 
   progressBar = (uploadSize) =>{
+    console.log(uploadSize);
       this.setState({
         percentUploaded: '' + Math.floor((uploadSize / this.state.fileSize ) * 100)
       });
@@ -118,7 +119,7 @@ class UploadFileSection extends React.Component {
     //save document to IPFS,return its hash#, and set hash# to state
     //https://github.com/ipfs/interface-ipfs-core/blob/master/SPEC/FILES.md#add
 
-    await ipfs.add(this.state.buffer, {progress: this.progressBar}, (err, ipfsHash) => {
+      ipfs.files.add(this.state.buffer, { progress: this.progressBar }, (err, ipfsHash) => {
       console.log(err,ipfsHash);
       //setState by setting ipfsHash to ipfsHash[0].hash 
       this.setState({ ipfsHash:ipfsHash[0].hash });
@@ -159,7 +160,7 @@ class UploadFileSection extends React.Component {
             <GridItem>
 
             <Form onSubmit={this.onSubmit}>
-              <label  for="file-upload" className="btn btn-info btn-lg">
+              <label  htmlFor="file-upload" className="btn btn-info btn-lg">
               <div style={{ textTransform: 'none' }}>
               {this.state.fileName}
               </div> 
@@ -169,23 +170,26 @@ class UploadFileSection extends React.Component {
             
              <Button 
              style={{ textTransform: 'none' }}
-             color={this.state.fileSize ? 'success' : 'failure'}
+             color={this.state.fileSize ? 'success' : 'default'}
              size="lg"
              type="submit"> 
-             Upload to IPFS 
+             Upload to IPFS
              </Button>
+
+             
+
             </Form>
             </GridItem>
 
-            <GridItem>
-            <CustomLinearProgress
+            <GridItem >
+            <CustomLinearProgress 
                   variant="determinate"
                   color="primary"
                   value={this.state.percentUploaded}
             />
             </GridItem>
             
-
+            
             <GridItem xs={12} sm={12} md={8}>
             <h3 className={classes.title} > IPFS Hash for the file </h3>
             <h4 className={classes.title} >{this.state.ipfsHash} </h4>
@@ -196,13 +200,14 @@ class UploadFileSection extends React.Component {
             <GridItem  xs={12} sm={12} md={8}>
             <div style={{display: this.state.ipfsURLDisplay ? 'block' : 'none' }} >
             <h3 className={classes.title} > Public URL for your file {this.state.ipfsURLDisplay} </h3>
-            <h4 className={classes.title} ><a target='_blank'  href={`https://ipfs.io/ipfs/${this.state.ipfsURL}`} download> https://ipfs.io/ipfs/{this.state.ipfsURL}</a>  </h4>
+            <h4 className={classes.title} ><a target='_blank' href={`https://ipfs.io/ipfs/${this.state.ipfsURL}`} > https://ipfs.io/ipfs/{this.state.ipfsURL}</a>  </h4>
             </div>
             </GridItem>
             
             
           </GridContainer>
         </div>
+        
       </div>
     );
   }
