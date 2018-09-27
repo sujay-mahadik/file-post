@@ -12,6 +12,7 @@ import GridContainer from "components/Grid/GridContainer.jsx";
 import GridItem from "components/Grid/GridItem.jsx";
 import InfoArea from "components/InfoArea/InfoArea.jsx";
 
+import CustomLinearProgress from "components/CustomLinearProgress/CustomLinearProgress.jsx";
 import Button from "components/CustomButtons/Button.jsx";
 import Input from "components/CustomInput/CustomInput.jsx"
 import "../css/custom.css"
@@ -33,13 +34,18 @@ class UploadFileSection extends React.Component {
   //eth-ipfs
   state = {
     ipfsHash:'hash will be available here after successful file upload',
-    ipfsURL:'URL will be available here after successful file upload',
+    ipfsURL:'',
+    ipfsURLDisplay: false,
     buffer:'',
     ethAddress:'',
     blockNumber:'',
     transactionHash:'',
     gasUsed:'',
-    txReceipt: ''   
+    txReceipt: '',
+    percentUploaded: '',
+    fileSize: '',
+    fileName: 'Select File',
+    fileType: ''
   };
  
   captureFile =(event) => {
@@ -47,8 +53,19 @@ class UploadFileSection extends React.Component {
       event.preventDefault()
       const file = event.target.files[0]
       let reader = new window.FileReader()
+
+      //size of file
+      this.setState({fileSize: event.target.files[0].size})
+      this.setState({fileName: event.target.files[0].name})
+      this.setState({fileType: event.target.files[0].type})
+
+      let file_name = event.target.files[0].name;
+    let file_type = event.target.files[0].type;
+
       reader.readAsArrayBuffer(file)
-      reader.onloadend = () => this.convertToBuffer(reader)    
+      reader.onloadend = () => this.convertToBuffer(reader)
+
+      
     };
 
   convertToBuffer = async(reader) => {
@@ -79,6 +96,13 @@ class UploadFileSection extends React.Component {
     } //catch
 } //onClick
 
+  progressBar = (uploadSize) =>{
+      this.setState({
+        percentUploaded: '' + Math.floor((uploadSize / this.state.fileSize ) * 100)
+      });
+      
+  };
+
   onSubmit = async (event) => {
     event.preventDefault();
 
@@ -92,11 +116,19 @@ class UploadFileSection extends React.Component {
     this.setState({ethAddress});
 
     //save document to IPFS,return its hash#, and set hash# to state
-    //https://github.com/ipfs/interface-ipfs-core/blob/master/SPEC/FILES.md#add 
-    await ipfs.add(this.state.buffer, (err, ipfsHash) => {
+    //https://github.com/ipfs/interface-ipfs-core/blob/master/SPEC/FILES.md#add
+
+    await ipfs.add(this.state.buffer, {progress: this.progressBar}, (err, ipfsHash) => {
       console.log(err,ipfsHash);
       //setState by setting ipfsHash to ipfsHash[0].hash 
       this.setState({ ipfsHash:ipfsHash[0].hash });
+
+      //set ipfsURL and ipfsURLDisplay
+      this.setState({ipfsURL: ipfsHash[0].hash});
+      this.setState({ipfsURLDisplay: true });
+
+      //
+      console.log(this.state.percentUploaded);
 
       // call Ethereum contract method "sendHash" and .send IPFS hash to etheruem contract 
       //return the transaction hash from the ethereum contract
@@ -125,24 +157,47 @@ class UploadFileSection extends React.Component {
         <div>
           <GridContainer justify="center">
             <GridItem>
+
             <Form onSubmit={this.onSubmit}>
-              <label for="file-upload" className="btn btn-info btn-lg">
-              Select file
+              <label  for="file-upload" className="btn btn-info btn-lg">
+              <div style={{ textTransform: 'none' }}>
+              {this.state.fileName}
+              </div> 
+              
               </label>
               <input id="file-upload" type="file" onChange = {this.captureFile} />
             
              <Button 
-             color="success"
+             style={{ textTransform: 'none' }}
+             color={this.state.fileSize ? 'success' : 'failure'}
              size="lg"
              type="submit"> 
-             Send it 
+             Upload to IPFS 
              </Button>
             </Form>
             </GridItem>
-                        
+
+            <GridItem>
+            <CustomLinearProgress
+                  variant="determinate"
+                  color="primary"
+                  value={this.state.percentUploaded}
+            />
+            </GridItem>
+            
+
             <GridItem xs={12} sm={12} md={8}>
             <h3 className={classes.title} > IPFS Hash for the file </h3>
             <h4 className={classes.title} >{this.state.ipfsHash} </h4>
+            </GridItem>
+
+            
+
+            <GridItem  xs={12} sm={12} md={8}>
+            <div style={{display: this.state.ipfsURLDisplay ? 'block' : 'none' }} >
+            <h3 className={classes.title} > Public URL for your file {this.state.ipfsURLDisplay} </h3>
+            <h4 className={classes.title} ><a target='_blank'  href={`https://ipfs.io/ipfs/${this.state.ipfsURL}`} download> https://ipfs.io/ipfs/{this.state.ipfsURL}</a>  </h4>
+            </div>
             </GridItem>
             
             
