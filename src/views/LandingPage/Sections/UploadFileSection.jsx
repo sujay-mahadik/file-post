@@ -13,7 +13,7 @@ import GridItem from "components/Grid/GridItem.jsx";
 
 //import InfoArea from "components/InfoArea/InfoArea.jsx";
 
-import CustomLinearProgress from "components/CustomLinearProgress/CustomLinearProgress.jsx";
+//import CustomLinearProgress from "components/CustomLinearProgress/CustomLinearProgress.jsx";
 import Button from "components/CustomButtons/Button.jsx";
 //import Input from "components/CustomInput/CustomInput.jsx"
 import "../css/custom.css"
@@ -29,7 +29,7 @@ import productStyle from "assets/jss/material-kit-react/views/landingPageSection
 
 //progress bar
 //import FileUploadProgress from 'react-fileupload-progress';
-
+import { Progress } from "semantic-ui-react";
 
 
 class UploadFileSection extends React.Component {
@@ -182,11 +182,15 @@ class UploadFileSection extends React.Component {
             </GridItem>
 
             <GridItem >
-            <CustomLinearProgress 
+            {/* <CustomLinearProgress 
                   variant="determinate"
                   color="primary"
                   value={this.state.percentUploaded}
-            />
+            /> */}
+            <div>
+            <Progress style={{ height: 20 }} percent={this.state.percentUploaded} indicating size='medium'/>
+            </div>
+
             </GridItem>
             
             
